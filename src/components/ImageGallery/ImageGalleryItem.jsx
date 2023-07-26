@@ -1,16 +1,16 @@
-//ImageGalleryItem.jsx
+// ImageGalleryItem.jsx
 import React from 'react';
-import PropTypes from 'prop-types'; // Importa PropTypes
+import PropTypes from 'prop-types';
 import { ItemList, ImgList } from './Styles/UlStyle';
 
-const ImageGalleryItem = ({ image, onClick, index }) => {
+const ImageGalleryItem = ({ image, onClick }) => {
   const handleImageClick = () => {
     onClick(image.largeImageURL);
   };
 
   return (
     <ItemList className="gallery-item" onClick={handleImageClick}>
-      <ImgList key={index}  src={image.webformatURL} alt={image.tags} />
+      <ImgList src={image.webformatURL} alt={image.tags} />
     </ItemList>
   );
 };
@@ -22,7 +22,6 @@ ImageGalleryItem.propTypes = {
     largeImageURL: PropTypes.string.isRequired,
   }).isRequired,
   onClick: PropTypes.func.isRequired,
-  index: PropTypes.number, // Add the "index" prop type
 };
 
 export default ImageGalleryItem;

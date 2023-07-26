@@ -1,5 +1,5 @@
 // App.jsx
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import Searchbar from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
@@ -7,7 +7,7 @@ import ImageGalleryItem from './ImageGallery/ImageGalleryItem';
 import Button from './Modal/Button';
 import Modal from './Modal/Modal';
 import Loader from './Loader/Loader';
-import { toast, Toaster } from 'react-hot-toast'; // Importa la función toast de react-hot-toast
+import { toast, Toaster } from 'react-hot-toast';
 
 const generateUniqueKey = id => {
   return `${id}_${Math.random()}`;
@@ -15,29 +15,23 @@ const generateUniqueKey = id => {
 
 const API_KEY = '37237543-aa08958e4f4ec45835618d6d1';
 
-class App extends Component {
-  state = {
-    images: [],
-    loading: false,
-    query: '',
-    showModal: false,
-    selectedImage: '',
-  };
+const App = () => {
+  const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [query, setQuery] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState('');
 
-  // Método para manejar la búsqueda de imágenes
-  handleImageSearch = async searchQuery => {
+  const handleImageSearch = async searchQuery => {
     try {
-      this.setState({ loading: true });
+      setLoading(true);
       const response = await axios.get(
         `https://pixabay.com/api/?key=${API_KEY}&q=${searchQuery}&image_type=photo&orientation=horizontal&per_page=12`
       );
       const images = response.data.hits;
-      this.setState({
-        // images: response.data.hits,
-        images,
-        loading: false,
-        query: searchQuery,
-      });
+      setImages(images);
+      setLoading(false);
+      setQuery(searchQuery);
       if (images.length === 0) {
         toast.error('No se encontraron resultados');
       } else {
@@ -46,72 +40,53 @@ class App extends Component {
     } catch (error) {
       toast.error('Error fetching images:', error);
       console.error('Error fetching images:', error);
-      this.setState({ loading: false });
+      setLoading(false);
     }
   };
-  //      toast.success('Búsqueda exitosa!');
-  //     } catch (error) {
-  //       toast.error('BError fetching images:', error);
-  //       console.error('Error fetching images:', error);
-  //     this.setState({ loading: false });
-  //   }
-  // };
 
-  // Método para cargar más imágenes cuando se presione el botón "Load more"
-  loadMoreImages = async () => {
+  const loadMoreImages = async () => {
     try {
-      this.setState({ loading: true });
-      const { query, images } = this.state;
+      setLoading(true);
       const nextPage = Math.ceil(images.length / 12) + 1;
       const response = await axios.get(
         `https://pixabay.com/api/?key=${API_KEY}&q=${query}&image_type=photo&orientation=horizontal&per_page=12&page=${nextPage}`
       );
-      this.setState(prevState => ({
-        images: [...prevState.images, ...response.data.hits],
-        loading: false,
-      }));
+      setImages(prevImages => [...prevImages, ...response.data.hits]);
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching more images:', error);
-      this.setState({ loading: false });
+      setLoading(false);
     }
   };
 
-  // Método para mostrar la imagen seleccionada en el modal
-  openModal = selectedImage => {
-    // console.log('openModal - selectedImage:', selectedImage);
-    this.setState({ showModal: true, selectedImage });
+  const openModal = selectedImage => {
+    setSelectedImage(selectedImage);
+    setShowModal(true);
   };
 
-  // Método para cerrar el modal
-  closeModal = () => {
-    this.setState({ showModal: false, selectedImage: '' });
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedImage('');
   };
 
-  render() {
-    const { images, loading, showModal, selectedImage } = this.state;
-
-    return (
-      <section>
-        <Searchbar onSubmit={this.handleImageSearch} />
-        <ImageGallery>
-          {images.map((image, index) => (
-            <ImageGalleryItem
-              // key={image.id + index}
-              key={generateUniqueKey(image.id)}
-              image={image}
-              onClick={this.openModal}
-            />
-          ))}
-        </ImageGallery>
-        {loading && <Loader />}
-        {images.length > 0 && !loading && (
-          <Button onClick={this.loadMoreImages} />
-        )}
-        {showModal && <Modal image={selectedImage} onClose={this.closeModal} />}
-        <Toaster /> {/* Agrega el componente Toaster */}
-      </section>
-    );
-  }
-}
+  return (
+    <section>
+      <Searchbar onSubmit={handleImageSearch} />
+      <ImageGallery>
+        {images.map((image, index) => (
+          <ImageGalleryItem
+            key={generateUniqueKey(image.id)}
+            image={image}
+            onClick={openModal}
+          />
+        ))}
+      </ImageGallery>
+      {loading && <Loader />}
+      {images.length > 0 && !loading && <Button onClick={loadMoreImages} />}
+      {showModal && <Modal image={selectedImage} onClose={closeModal} />}
+      <Toaster />
+    </section>
+  );
+};
 
 export default App;

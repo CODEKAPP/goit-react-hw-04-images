@@ -1,4 +1,4 @@
-//ImageGallery.jsx
+// ImageGallery.jsx
 import React from 'react';
 import { ListStyle } from './Styles/UlStyle';
 

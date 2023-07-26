@@ -1,10 +1,7 @@
-//Loader.jsx
+// Loader.jsx
 import React from 'react';
-import {
-  Vortex,
-} from 'react-loader-spinner';
+import { Vortex } from 'react-loader-spinner';
 import css from './Styles/Loader.module.css';
-
 
 const Loader = () => {
   return (
@@ -21,4 +18,5 @@ const Loader = () => {
     </div>
   );
 };
+
 export default Loader;
