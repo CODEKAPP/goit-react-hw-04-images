@@ -1,0 +1,8 @@
+/* loader.css */
+
+.LoaderContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%; /* Puedes ajustar la altura según tus necesidades */
+}
